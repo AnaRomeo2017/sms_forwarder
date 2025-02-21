@@ -1,0 +1,35 @@
+name: sms_forwarder
+description: "An optimized Flutter project for SMS forwarding and QR scanning."
+publish_to: 'none' 
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.3.0 <4.0.0" # دعم أحدث إصدار من Dart مع إبقاء التوافق
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/logo.png
+
+dependencies:
+  flutter:
+    sdk: flutter   
+  telephony: ^0.2.0
+  material_color_utilities: ^0.11.1  
+  mobile_scanner: ^3.2.0  # مكتبة خفيفة لمس0ح QR
+  http: ^1.2.0  # التحديث إلى إصدار أحدث
+  flutter_local_notifications: ^18.0.1  # دعم الإشعارات
+  shared_preferences: ^2.2.2  # لحفظ الإعدادات بشكل محلي
+  intl: ^0.19.0  # التعامل مع التواريخ والوقت
+  cupertino_icons: ^1.0.6  # أيقونات iOS
+  flutter_secure_storage: ^9.0.0  # تخزين آمن للبيانات الحساسة
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.1  # تحديث قواعد التحليل البرمجي
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/logo.png"
