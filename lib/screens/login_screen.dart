@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-import 'screens/home_screen.dart';
+import 'home_screen.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -19,6 +20,26 @@ class LoginScreenState extends State<LoginScreen> {
   String? errorMessage;
   bool isScanning = true;
 
+  @override
+  void initState() {
+    super.initState();
+    _checkLoginStatus();
+  }
+
+  // 🔹 التحقق مما إذا كان المستخدم قد سجل الدخول مسبقًا
+  Future<void> _checkLoginStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+
+    if (isLoggedIn && mounted) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+      );
+    }
+  }
+
+  // 🔹 تسجيل الدخول وحفظ بيانات المستخدم
   Future<void> loginWithToken(String token) async {
     if (token.isEmpty) return;
 
@@ -29,7 +50,7 @@ class LoginScreenState extends State<LoginScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse("https://mr-hatem.com/auth.php"),
+        Uri.parse("https://sup4fans.com/suppay/auth.php"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"token": token}),
       );
@@ -44,15 +65,22 @@ class LoginScreenState extends State<LoginScreen> {
         final data = jsonDecode(response.body);
         if (data["status"] == true) {
           await secureStorage.write(key: "userToken", value: token);
-          Navigator.pushReplacement(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (context, animation, secondaryAnimation) => const HomeScreen(),
-              transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                return FadeTransition(opacity: animation, child: child);
-              },
-            ),
-          );
+
+          // 🔹 حفظ حالة تسجيل الدخول
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setBool('isLoggedIn', true);
+
+          if (mounted) {
+            Navigator.pushReplacement(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) => const HomeScreen(),
+                transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                  return FadeTransition(opacity: animation, child: child);
+                },
+              ),
+            );
+          }
         } else {
           setState(() {
             errorMessage = data["message"];
@@ -70,6 +98,7 @@ class LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  // 🔹 تسجيل الدخول عبر مسح QR
   void loginWithQR() {
     showDialog(
       context: context,
@@ -130,16 +159,16 @@ class LoginScreenState extends State<LoginScreen> {
               isLoading
                   ? const CircularProgressIndicator()
                   : ElevatedButton.icon(
-                      onPressed: () => loginWithToken(tokenController.text.trim()),
-                      icon: const Icon(Icons.vpn_key),
-                      label: const Text("تسجيل الدخول بـ Token"),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blueAccent,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      ),
-                    ),
+                onPressed: () => loginWithToken(tokenController.text.trim()),
+                icon: const Icon(Icons.vpn_key),
+                label: const Text("تسجيل الدخول بـ Token"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueAccent,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+              ),
               const SizedBox(height: 10),
               OutlinedButton.icon(
                 onPressed: loginWithQR,

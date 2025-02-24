@@ -13,16 +13,20 @@ flutter:
 
 dependencies:
   flutter:
-    sdk: flutter   
+    sdk: flutter
+  dio: ^5.3.2
+  flutter_background_service: ^5.1.0
   telephony: ^0.2.0
   material_color_utilities: ^0.11.1  
-  mobile_scanner: ^3.2.0  # مكتبة خفيفة لمس0ح QR
-  http: ^1.2.0  # التحديث إلى إصدار أحدث
-  flutter_local_notifications: ^18.0.1  # دعم الإشعارات
-  shared_preferences: ^2.2.2  # لحفظ الإعدادات بشكل محلي
-  intl: ^0.19.0  # التعامل مع التواريخ والوقت
-  cupertino_icons: ^1.0.6  # أيقونات iOS
-  flutter_secure_storage: ^9.0.0  # تخزين آمن للبيانات الحساسة
+  mobile_scanner: ^3.2.0
+  http: ^1.2.0
+  flutter_local_notifications: ^18.0.1
+  shared_preferences: ^2.0.6
+  intl: ^0.19.0
+  cupertino_icons: ^1.0.6
+  flutter_secure_storage: ^9.0.0
+  logger: ^1.0.0
+  permission_handler: ^11.4.0
 
 dev_dependencies:
   flutter_test:

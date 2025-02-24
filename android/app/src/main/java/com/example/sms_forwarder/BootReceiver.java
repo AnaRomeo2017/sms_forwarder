@@ -9,7 +9,16 @@ public class BootReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
-            Log.d("BootReceiver", "Device rebooted. BootReceiver triggered.");
+            Log.d("BootReceiver", "✅ الجهاز أعيد تشغيله - تشغيل الخدمة في الخلفية.");
+
+            // ✅ تشغيل التطبيق تلقائيًا بعد إعادة التشغيل
+            Intent startIntent = new Intent(context, MainActivity.class);
+            startIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(startIntent);
+
+            // ✅ تشغيل خدمة الخلفية (إذا كنت تستخدمها)
+            Intent serviceIntent = new Intent(context, BackgroundService.class);
+            context.startService(serviceIntent);
         }
     }
 }

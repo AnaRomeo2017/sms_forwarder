@@ -24,8 +24,6 @@ class QRCodeScannerScreenState extends State<QRCodeScannerScreen> {
       hasError = false;
     });
 
-    final BuildContext currentContext = context;
-
     try {
       final response = await http.post(
         Uri.parse("https://mr-hatem.com/auth.php"),
@@ -41,15 +39,17 @@ class QRCodeScannerScreenState extends State<QRCodeScannerScreen> {
           SharedPreferences prefs = await SharedPreferences.getInstance();
           await prefs.setString('userToken', token);
 
-          Navigator.pushReplacement(
-            currentContext,
-            PageRouteBuilder(
-              pageBuilder: (_, __, ___) => const HomeScreen(),
-              transitionsBuilder: (_, animation, __, child) {
-                return FadeTransition(opacity: animation, child: child);
-              },
-            ),
-          );
+          if (mounted) {
+            Navigator.pushReplacement(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) => const HomeScreen(),
+                transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                  return FadeTransition(opacity: animation, child: child);
+                },
+              ),
+            );
+          }
         } else {
           showErrorDialog("فشل التحقق: ${data["message"]}");
         }
@@ -112,7 +112,7 @@ class QRCodeScannerScreenState extends State<QRCodeScannerScreen> {
               margin: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16),
-                boxShadow: [
+                boxShadow: const [
                   BoxShadow(color: Colors.black26, blurRadius: 8, spreadRadius: 2)
                 ],
               ),

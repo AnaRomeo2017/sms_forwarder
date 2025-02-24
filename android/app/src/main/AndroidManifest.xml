@@ -2,41 +2,40 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.sms_forwarder">
 
-    <!-- دعم الأجهزة التي لا تحتوي على SIM -->
     <uses-feature
         android:name="android.hardware.telephony"
         android:required="false" />
 
-    <!-- الأذونات المطلوبة -->
+    <uses-permission android:name="android.permission.SEND_SMS"/>
     <uses-permission android:name="android.permission.RECEIVE_SMS"/>
     <uses-permission android:name="android.permission.READ_SMS"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK"/> <!-- منع الهاتف من إيقاف التطبيق -->
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
 
     <application
-        android:label="@string/app_name"
+        android:label="sms_forwarder"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:allowBackup="true"
-        android:theme="@style/Theme.SMSForwarder.Light"> <!-- ✅ تحديث السمة إلى Theme.SmsForwarder -->
+        android:theme="@style/Theme.SMSForwarder.Light">
 
-        <!-- النشاط الرئيسي -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:launchMode="singleTop"
             android:taskAffinity=""
-            android:theme="@style/Theme.SMSForwarder.Light"
-            android:configChanges="orientation|keyboardHidden|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:theme="@style/LaunchTheme"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|screenLayout|density|layoutDirection|fontScale|uiMode"
             android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustResize">
 
             <meta-data
                 android:name="io.flutter.embedding.android.NormalTheme"
-                android:resource="@style/Theme.SMSForwarder.Light"/>
+                android:resource="@style/NormalTheme"/>
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -47,8 +46,9 @@
         <!-- استقبال الرسائل SMS -->
         <receiver
             android:name="com.example.sms_forwarder.SmsReceiver"
+            android:enabled="true"
             android:exported="true"
-            android:permission="android.permission.BROADCAST_SMS">
+            android:permission="android.permission.RECEIVE_SMS">
             <intent-filter android:priority="999">
                 <action android:name="android.provider.Telephony.SMS_RECEIVED"/>
             </intent-filter>
@@ -58,29 +58,46 @@
         <receiver
             android:name="com.example.sms_forwarder.BootReceiver"
             android:enabled="true"
-            android:exported="false">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.QUICKBOOT_POWERON"/>
             </intent-filter>
         </receiver>
 
-        <!-- التأكد من إمكانية استقبال الإشعارات -->
+        <!-- خدمة الخلفية لاستمرار تشغيل التطبيق -->
+        <service
+            android:name="com.example.sms_forwarder.BackgroundService"
+            android:foregroundServiceType="dataSync"
+            android:enabled="true"
+            android:exported="false"
+            android:stopWithTask="false">
+        </service>
+
         <service
             android:name="com.example.sms_forwarder.NotificationService"
             android:enabled="true"
-            android:exported="false">
+            android:exported="false"
+            tools:ignore="MissingClass">
             <intent-filter>
                 <action android:name="android.intent.action.NOTIFICATION_LISTENER_SERVICE"/>
             </intent-filter>
         </service>
 
-        <!-- بيانات خاصة بـ Flutter -->
+        <service
+            android:name="id.flutter.flutter_background_service.BackgroundService"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+            </intent-filter>
+        </service>
+
         <meta-data
             android:name="flutterEmbedding"
             android:value="2"/>
     </application>
 
-    <!-- التأكد من إمكانية التعامل مع الرسائل النصية -->
     <queries>
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>
